@@ -72,7 +72,7 @@ public class FastaReader {
     }
 
     public void write (int alignmentScatter) { //try to prettyprint alignment; works for alignmentscatter >0
-        if(alignmentScatter > 0) {
+        if(alignmentScatter < 0) {
             System.out.println("Posstible Scatters: > 0");
             alignmentScatter = 1;
         }
