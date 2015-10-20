@@ -39,9 +39,8 @@ public class FastaReader {
         boolean firstHeader = true;
         while((hdr = ((char)(headertest = reader.read()) == '>')) || ((line = reader.readLine()) != null)) {
 
-            if(hdr) {
+            if(hdr) { //header? +reading
                 if(!firstHeader) {
-                    seqList.add(se);
                     se = new Sequence();
                 }
                 firstHeader = false;
@@ -49,12 +48,11 @@ public class FastaReader {
                 if(getMaxHdrLength() < se.getHeader().length()) {
                     setMaxHdrLength(se.getHeader().length());
                 }
-            } else {
+            } else { //sequence reading
                 String temp = (char)headertest + line;
-                //System.out.println("temp: " + temp);
+
                 char[] temp2 = temp.toCharArray();
-                //System.out.print("chararray temp2: ");
-                //Tools.printCharArray(temp2);
+
                 Nucleotide nuc = new Nucleotide();
                 ArrayList<Nucleotide> temp3 = new ArrayList<Nucleotide>();
                 for(int i = 0; i < temp2.length; i++) {
@@ -67,40 +65,29 @@ public class FastaReader {
                     se.setContent(temp3);
                 } else {
                     se.getContent().addAll(temp3);
-                    Tools.printArrayList(temp3);
-                    System.out.println();
-                    Tools.printArrayList(se.getContent());
-                    System.out.println();
                     setSeqLength(se.getContent().size());
+                    seqList.add(se);
                 }
             }
         }
         return 0;
     }
 
-    public void write (int alignmentScatter) {
-
-        System.out.println("Max Hdr Length: " + getMaxHdrLength());
-        System.out.println("Seq Length: " + getSeqLength());
-        if(alignmentScatter < 1) {
-            System.out.println("Invalid Alignment Scatter Value. Using minimal scattering (1)");
-            alignmentScatter = 1;
-        }
-
-        int rangeA = 1;
-        int rangeB = alignmentScatter;
+    public void write (int alignmentScatter) { //try to prettyprint alignment; works for alignmentscatter >9
+        int rangeA = 0;
+        int rangeB = alignmentScatter - 1;
         int digitA = 0;
         int digitB = 0;
         while(rangeA < getSeqLength()) {
             if(rangeB > getSeqLength()) {
-                rangeB = getSeqLength();
+                rangeB = getSeqLength() + 1;
             }
             digitA = (getMaxHdrLength() + 3 + Integer.toString(rangeA).length());
             digitB = ((rangeB - rangeA) + 1 - Integer.toString(rangeA).length());
             if(digitB < digitA) {
                 digitB = digitB + Integer.toString(digitA).length();
             }
-            System.out.printf("%"+ digitA + "s", rangeA);
+            System.out.printf("%"+ digitA + "s", rangeA + 1); //positions, e.g. 1 - 60
             System.out.printf("%" + digitB + "s", rangeB + "\n");
             for(int i = 0; i < seqList.size(); i++) {
                 System.out.printf("%-"+ (getMaxHdrLength() + 3) +"s", seqList.get(i).getHeader());
@@ -109,23 +96,10 @@ public class FastaReader {
                 }
                 System.out.print("\n");
             }
-            rangeA = rangeB + 1;
+            rangeA = rangeB;
             rangeB += alignmentScatter;
             System.out.print("\n");
         }
     }
 
-
-    public static void main(String[] args) throws IOException {
-        FastaReader fasta = new FastaReader();
-        fasta.read(new BufferedReader(new FileReader("fastareader/data/exemplary_RNA_aln.fa")));
-
-        for(int x = 0; x < fasta.seqList.size(); x++) {
-            Tools.printSequence(fasta.seqList.get(x));
-            System.out.println();
-        }
-
-
-        //fasta.write(60);
-    }
 }
