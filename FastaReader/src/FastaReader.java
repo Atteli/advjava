@@ -35,6 +35,7 @@ public class FastaReader {
                 for(int i = 0; i < temp2.length; i++) {
                     nuc.setFlavor(temp2[i]);
                     temp3.add(nuc);
+                    nuc = new Nucleotide();
                 }
 
                 if(se.getContent().isEmpty()) {
@@ -47,8 +48,31 @@ public class FastaReader {
         return 0;
     }
 
-    public static void main(String [] args) throws IOException {
+    public void write (Writer writer) throws IOException {
+        try {
+            for (int i = 0; i < seqList.size(); i++) {
+                writer.write(seqList.get(i).getHeader() + "\n");
+                for(int j = 0; j < seqList.get(i).getContent().size(); j++) {
+                    writer.write(seqList.get(i).getContent().get(j).getFlavor());
+
+                }
+                writer.write("\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Couldn't save File");
+        } finally {
+            if (writer != null)
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
         FastaReader fasta = new FastaReader();
         fasta.read(new BufferedReader(new FileReader("fastareader/data/exemplary_RNA_aln.fa")));
+        fasta.write(new OutputStreamWriter(System.out));
     }
 }
