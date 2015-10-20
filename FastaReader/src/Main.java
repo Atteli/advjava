@@ -17,6 +17,6 @@ public class Main {
         //}
 
 
-        fasta.write(-1);
+        fasta.write(60);
     }
 }
