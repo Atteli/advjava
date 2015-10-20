@@ -17,6 +17,6 @@ public class Main {
         //}
 
 
-        fasta.write(60); //fails for < 10
+        fasta.write(-1);
     }
 }

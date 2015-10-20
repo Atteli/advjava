@@ -1,7 +1,5 @@
-import javax.management.openmbean.InvalidOpenTypeException;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.stream.Stream;
 
 /**
  * Created by XL on 18.10.2015.
@@ -73,18 +71,23 @@ public class FastaReader {
         return 0;
     }
 
-    public void write (int alignmentScatter) { //try to prettyprint alignment; works for alignmentscatter >9
+    public void write (int alignmentScatter) { //try to prettyprint alignment; works for alignmentscatter >0
+        if(alignmentScatter > 0) {
+            System.out.println("Posstible Scatters: > 0");
+            alignmentScatter = 1;
+        }
         int rangeA = 0;
-        int rangeB = alignmentScatter - 1;
+        int rangeB = 0;
         int digitA = 0;
         int digitB = 0;
         while(rangeA < getSeqLength()) {
+            rangeB += alignmentScatter;
             if(rangeB > getSeqLength()) {
-                rangeB = getSeqLength() + 1;
+                rangeB = getSeqLength();
             }
             digitA = (getMaxHdrLength() + 3 + Integer.toString(rangeA).length());
             digitB = ((rangeB - rangeA) + 1 - Integer.toString(rangeA).length());
-            if(digitB < digitA) {
+            if(digitB < digitA) { //prevent printf crash when scatter is too low
                 digitB = digitB + Integer.toString(digitA).length();
             }
             System.out.printf("%"+ digitA + "s", rangeA + 1); //positions, e.g. 1 - 60
@@ -97,7 +100,7 @@ public class FastaReader {
                 System.out.print("\n");
             }
             rangeA = rangeB;
-            rangeB += alignmentScatter;
+
             System.out.print("\n");
         }
     }
